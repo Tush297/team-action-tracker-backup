@@ -4,6 +4,10 @@ on:
   repository_dispatch:
     types: [excel_sync]
 
+permissions:
+  issues: write
+  contents: read
+
 jobs:
   create_issue:
     runs-on: ubuntu-latest
@@ -16,17 +20,18 @@ jobs:
           script: |
             const payload = context.payload.client_payload;
 
-            const title = payload.title;
+            const title = payload.title || "Untitled Task";
+
             const body = `
-            Task ID: ${payload.task_id}
-            Owner: ${payload.owner}
-            Status: ${payload.status}
-            Start Date: ${payload.start_date}
-            ETA: ${payload.eta}
-            Last Updated: ${payload.last_updated}
+            Task ID: ${payload.task_id || "N/A"}
+            Owner: ${payload.owner || "N/A"}
+            Status: ${payload.status || "N/A"}
+            Start Date: ${payload.start_date || "N/A"}
+            ETA: ${payload.eta || "N/A"}
+            Last Updated: ${payload.last_updated || "N/A"}
 
             Description:
-            ${payload.description}
+            ${payload.description || "No description provided"}
             `;
 
             await github.rest.issues.create({
